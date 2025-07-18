@@ -3,69 +3,88 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>True Random</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-    }
 
-    .container {
-      display: flex;
-      height: 100vh;
-    }
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
-    .left,
-    .center,
-    .right {
-      flex: 1;
-      padding: 10px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      border-right: 1px solid #ddd;
-    }
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
 
-    .right {
-      border-right: none;
-    }
+.left,
+.center,
+.right {
+  flex: 1;
+  min-width: 300px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-right: 1px solid #ddd;
+}
 
-    button {
-      margin: 5px 5px 5px 0;
-    }
+.right {
+  border-right: none;
+}
 
-    .positive {
-      color: green;
-    }
+button {
+  margin: 5px 5px 5px 0;
+}
 
-    .negative {
-      color: red;
-    }
+.positive {
+  color: green;
+}
 
-    .neutral {
-      color: gray;
-    }
+.negative {
+  color: red;
+}
 
-    .history-item {
-      margin-bottom: 4px;
-    }
+.neutral {
+  color: gray;
+}
 
-    .history-title {
-      margin-top: 10px;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
+.history-item {
+  margin-bottom: 4px;
+}
 
-    .count-line {
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
+.history-title {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
 
-    textarea {
-      width: 100%;
-      box-sizing: border-box;
-      height: 60px;
-    }
+.count-line {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  height: 60px;
+}
+
+/* ✅ Responsive: Stack vertically below 768px */
+@media (max-width: 768px) {
+  .left,
+  .center,
+  .right {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .right {
+    border-bottom: none;
+  }
+}
+
+
   </style>
 </head>
 
