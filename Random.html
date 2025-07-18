@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>True Random</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .left,
+    .center,
+    .right {
+      flex: 1;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+    }
+
+    .right {
+      border-right: none;
+    }
+
+    button {
+      margin: 5px 5px 5px 0;
+    }
+
+    .positive {
+      color: green;
+    }
+
+    .negative {
+      color: red;
+    }
+
+    .neutral {
+      color: gray;
+    }
+
+    .history-item {
+      margin-bottom: 4px;
+    }
+
+    .history-title {
+      margin-top: 10px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .count-line {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      height: 60px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Left: Ask! -->
+    <div class="left">
+      <div>
+        <button onclick="showRandomAnswer()">Ask!</button>
+        <button onclick="clearHistory('quick-history-list', 'quick')">Reset</button>
+        <p id="result"></p>
+      </div>
+      <div>
+        <div class="history-title">Ask History</div>
+        <div class="count-line">
+          ✅ <span id="quick-positive-count">0</span>
+          ❌ <span id="quick-negative-count">0</span>
+          ⚪ <span id="quick-neutral-count">0</span>
+        </div>
+        <div id="quick-history-list"></div>
+      </div>
+    </div>
+
+    <!-- Center: Custom Ask -->
+    <div class="center">
+      <div>
+        <textarea id="custom-options" placeholder="Enter options separated by commas"></textarea>
+        <button onclick="showCustomRandom()">Ask Custom!</button>
+        <button onclick="clearHistory('custom-history-list')">Reset</button>
+        <p id="custom-result"></p>
+      </div>
+      <div>
+        <div class="history-title">Custom History</div>
+        <div id="custom-history-list"></div>
+      </div>
+    </div>
+
+    <!-- Right: Ask 8 -->
+    <div class="right">
+      <div>
+        <button onclick="showRandom8BallAnswer()">Ask 8!</button>
+        <button onclick="clearHistory('magic8-history-list', 'magic8')">Reset</button>
+        <p id="8ball-result"></p>
+      </div>
+      <div>
+        <div class="history-title">8 History</div>
+        <div class="count-line">
+          ✅ <span id="magic8-positive-count">0</span>
+          ❌ <span id="magic8-negative-count">0</span>
+          ⚪ <span id="magic8-neutral-count">0</span>
+        </div>
+        <div id="magic8-history-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Count states
+    const counts = {
+      quick: { positive: 0, negative: 0, neutral: 0 },
+      magic8: { positive: 0, negative: 0, neutral: 0 }
+    };
+
+    function getTrulyRandomAnswer() {
+      const options = ['Yes', 'No', 'Maybe'];
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      const index = array[0] % options.length;
+      return options[index];
+    }
+
+    function showRandomAnswer() {
+      const result = getTrulyRandomAnswer();
+      const resultEl = document.getElementById('result');
+
+      let type = '';
+      if (result === 'Yes') type = 'positive';
+      else if (result === 'No') type = 'negative';
+      else type = 'neutral';
+
+      resultEl.textContent = `Answer: ${result}`;
+      resultEl.className = type;
+
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `history-item ${type}`;
+      entry.innerHTML = `<span>[${time}]</span> ${result}`;
+      document.getElementById('quick-history-list').prepend(entry);
+
+      counts.quick[type]++;
+      updateCounts('quick');
+    }
+
+    function getBalancedMagic8BallAnswer() {
+      const answers = [
+        { text: "It is certain", type: "positive" },
+        { text: "Without a doubt", type: "positive" },
+        { text: "Yes – definitely", type: "positive" },
+        { text: "You may rely on it", type: "positive" },
+        { text: "Most likely", type: "positive" },
+        { text: "Outlook good", type: "positive" },
+
+        { text: "Don’t count on it", type: "negative" },
+        { text: "My reply is no", type: "negative" },
+        { text: "My sources say no", type: "negative" },
+        { text: "Outlook not so good", type: "negative" },
+        { text: "Very doubtful", type: "negative" },
+        { text: "Absolutely not", type: "negative" },
+
+        { text: "Ask again later", type: "neutral" },
+        { text: "Cannot predict now", type: "neutral" },
+        { text: "Reply hazy, try again", type: "neutral" }
+      ];
+
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      const index = array[0] % answers.length;
+      return answers[index];
+    }
+
+    function showRandom8BallAnswer() {
+      const result = getBalancedMagic8BallAnswer();
+      const resultEl = document.getElementById('8ball-result');
+
+      resultEl.textContent = `Answer: ${result.text}`;
+      resultEl.className = result.type;
+
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `history-item ${result.type}`;
+      entry.innerHTML = `<span>[${time}]</span> ${result.text}`;
+      document.getElementById('magic8-history-list').prepend(entry);
+
+      counts.magic8[result.type]++;
+      updateCounts('magic8');
+    }
+
+    function showCustomRandom() {
+      const input = document.getElementById('custom-options').value.trim();
+      const resultEl = document.getElementById('custom-result');
+      const historyList = document.getElementById('custom-history-list');
+
+      if (!input) {
+        resultEl.textContent = 'Please enter options';
+        resultEl.className = 'neutral';
+        return;
+      }
+
+      const options = input.split(',').map(opt => opt.trim()).filter(Boolean);
+      if (options.length < 2) {
+        resultEl.textContent = 'Enter at least 2 options';
+        resultEl.className = 'neutral';
+        return;
+      }
+
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      const index = array[0] % options.length;
+      const selected = options[index];
+
+      resultEl.textContent = `Answer: ${selected}`;
+      resultEl.className = '';
+
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'history-item';
+      entry.innerHTML = `<span>[${time}]</span> ${selected}`;
+      historyList.prepend(entry);
+    }
+
+    function clearHistory(listId, group = null) {
+      document.getElementById(listId).innerHTML = '';
+
+      if (group) {
+        counts[group] = { positive: 0, negative: 0, neutral: 0 };
+        updateCounts(group);
+      }
+    }
+
+    function updateCounts(group) {
+      document.getElementById(`${group}-positive-count`).textContent = counts[group].positive;
+      document.getElementById(`${group}-negative-count`).textContent = counts[group].negative;
+      document.getElementById(`${group}-neutral-count`).textContent = counts[group].neutral;
+    }
+  </script>
+</body>
+
+</html>
